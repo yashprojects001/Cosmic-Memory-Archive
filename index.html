@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cosmic Memory Archive</title>
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+background:black;
+font-family:Arial, Helvetica, sans-serif;
+color:white;
+}
+
+/* Galaxy Background */
+
+canvas{
+position:absolute;
+top:0;
+left:0;
+}
+
+/* Title */
+
+.title{
+position:absolute;
+top:40px;
+width:100%;
+text-align:center;
+font-size:40px;
+letter-spacing:4px;
+color:#9be7ff;
+text-shadow:0 0 15px #00e5ff;
+z-index:10;
+}
+
+/* Memory panel */
+
+.memoryBox{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:rgba(0,0,20,0.9);
+border:1px solid #00e5ff;
+padding:30px;
+border-radius:10px;
+width:400px;
+display:none;
+box-shadow:0 0 20px #00e5ff;
+z-index:20;
+}
+
+.memoryBox h2{
+margin-top:0;
+color:#00e5ff;
+}
+
+.closeBtn{
+margin-top:20px;
+padding:8px 15px;
+border:none;
+background:#00e5ff;
+cursor:pointer;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="title">COSMIC MEMORY ARCHIVE</div>
+
+<canvas id="space"></canvas>
+
+<div class="memoryBox" id="memoryBox">
+<h2 id="memoryTitle"></h2>
+<p id="memoryText"></p>
+<button class="closeBtn" onclick="closeMemory()">Close</button>
+</div>
+
+<script>
+
+const canvas = document.getElementById("space");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+const memories = [
+{title:"First Coding Moment", text:"The day you wrote your first program and felt like a creator."},
+{title:"College Life", text:"Late night coding, friends, dreams, and endless curiosity."},
+{title:"Startup Dream", text:"The moment you decided to build something that changes the world."},
+{title:"Learning Never Stops", text:"Every skill you learn becomes another star in your universe."},
+{title:"Future Vision", text:"A future where your ideas shape technology."}
+];
+
+class Star{
+constructor(x,y,radius,memory){
+this.x=x;
+this.y=y;
+this.radius=radius;
+this.memory=memory;
+this.alpha=Math.random();
+this.speed=Math.random()*0.02;
+}
+
+draw(){
+ctx.beginPath();
+ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+ctx.fillStyle="rgba(155,231,255,"+this.alpha+")";
+ctx.shadowBlur=20;
+ctx.shadowColor="#00e5ff";
+ctx.fill();
+}
+
+update(){
+this.alpha+=this.speed;
+if(this.alpha>=1 || this.alpha<=0){
+this.speed=-this.speed;
+}
+this.draw();
+}
+}
+
+for(let i=0;i<80;i++){
+
+let x=Math.random()*canvas.width;
+let y=Math.random()*canvas.height;
+let r=Math.random()*2+1;
+
+let memory = memories[Math.floor(Math.random()*memories.length)];
+
+stars.push(new Star(x,y,r,memory));
+
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+stars.forEach(star=>{
+star.update();
+});
+
+requestAnimationFrame(animate);
+}
+
+animate();
+
+/* Click detection */
+
+canvas.addEventListener("click",function(e){
+
+let rect = canvas.getBoundingClientRect();
+
+let mouseX = e.clientX - rect.left;
+let mouseY = e.clientY - rect.top;
+
+stars.forEach(star=>{
+
+let dx = mouseX - star.x;
+let dy = mouseY - star.y;
+let dist = Math.sqrt(dx*dx + dy*dy);
+
+if(dist < star.radius + 5){
+
+showMemory(star.memory);
+
+}
+
+});
+
+});
+
+/* Memory popup */
+
+function showMemory(memory){
+
+document.getElementById("memoryTitle").innerText = memory.title;
+document.getElementById("memoryText").innerText = memory.text;
+
+document.getElementById("memoryBox").style.display="block";
+
+}
+
+function closeMemory(){
+document.getElementById("memoryBox").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
